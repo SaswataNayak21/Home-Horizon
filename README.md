@@ -1,8 +1,7 @@
 # Home-Horizon
 
  Project Title: Home Horizon
-🏗️ Project Description:
-House Price Predictor is a web-based application designed to estimate the price of a house based on key features such as house age, distance to the nearest MRT station, and the number of nearby convenience stores. The project utilizes a dataset of real estate listings to provide instant price predictions and dynamic feedback to users.
+🏗️ Project Description: It is a web-based application designed to estimate the price of a house based on key features such as house age, distance to the nearest MRT station, and the number of nearby convenience stores. The project utilizes a dataset of real estate listings to provide instant price predictions and dynamic feedback to users.
 
 The primary objective of this project is to simplify the process of understanding property values by offering a user-friendly interface, interactive inputs, and real-time predictions powered by basic logic filtering. The system analyzes similar historical data to find the best possible price match and displays the result accordingly.
 
