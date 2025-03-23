@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Predictor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fff6eb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #5c3b1e;
+        }
+
+        .container {
+            max-width: 500px;
+            background-color: #fff1d6;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .container h2 {
+            font-size: 28px;
+            color: #d76a03;
+            margin-bottom: 25px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        label {
+            font-size: 15px;
+            color: #5c3b1e;
+            margin-bottom: 6px;
+            display: block;
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e1c2a0;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: #fff9f0;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #ff944d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #e67200;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                width: 90%;
+            }
+
+            button {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🏠 House Price Predictor</h2>
+
+        <div class="input-group">
+            <label for="age">House Age (Max: <span id="maxAge"></span> yrs)</label>
+            <input type="number" id="age" placeholder="Enter house age in years">
+        </div>
+
+        <div class="input-group">
+            <label for="distance">Distance to MRT (Max: <span id="maxDistance"></span> m)</label>
+            <input type="number" id="distance" placeholder="Enter distance to MRT">
+        </div>
+
+        <div class="input-group">
+            <label for="stores">Number of Stores (Max: <span id="maxStores"></span>)</label>
+            <input type="number" id="stores" placeholder="Enter number of convenience stores">
+        </div>
+
+        <button onclick="predictPrice()">Predict Price</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Dataset
+        const dataset = [
+            { age: 32, distance: 84.87882, stores: 10, price: 37.9 },
+            { age: 19.5, distance: 306.5947, stores: 9, price: 42.2 },
+            { age: 13.3, distance: 561.9845, stores: 5, price: 47.3 },
+            { age: 13.3, distance: 561.9845, stores: 5, price: 54.8 },
+            { age: 5, distance: 390.5684, stores: 5, price: 43.1 },
+            { age: 7.1, distance: 2175.03, stores: 3, price: 32.1 },
+            { age: 34.5, distance: 623.4731, stores: 7, price: 40.3 },
+            { age: 20.3, distance: 287.6025, stores: 6, price: 46.7 },
+            { age: 31.7, distance: 5512.038, stores: 1, price: 18.8 },
+            { age: 17.9, distance: 1783.18, stores: 3, price: 22.1 },
+            { age: 34.8, distance: 405.2134, stores: 7, price: 41.4 },
+            { age: 6.3, distance: 90.45606, stores: 9, price: 58.1 },
+            { age: 13, distance: 492.2313, stores: 5, price: 39.3 },
+            { age: 20.4, distance: 2469.645, stores: 4, price: 23.8 },
+            { age: 13.2, distance: 1164.838, stores: 4, price: 34.3 },
+            { age: 35.7, distance: 579.2083, stores: 2, price: 50.5 },
+            { age: 0, distance: 292.9978, stores: 6, price: 70.1 },
+            { age: 17.7, distance: 350.8515, stores: 1, price: 37.4 },
+            { age: 16.9, distance: 368.1363, stores: 8, price: 42.3 },
+            { age: 1.5, distance: 23.38284, stores: 7, price: 47.7 },
+            { age: 10.5, distance: 2275.877, stores: 3, price: 29.3 },
+            { age: 10.5, distance: 279.1726, stores: 7, price: 51.6 },
+            { age: 14.7, distance: 1360.139, stores: 1, price: 24.6 },
+            { age: 10.1, distance: 279.1726, stores: 7, price: 47.9 },
+            { age: 39.6, distance: 480.6977, stores: 4, price: 38.8 },
+            { age: 29.3, distance: 1487.868, stores: 2, price: 27 },
+            { age: 3.1, distance: 383.8624, stores: 5, price: 56.2 },
+            { age: 10.4, distance: 276.4949, stores: 5, price: 33.6 },
+            { age: 19, distance: 557.478, stores: 4, price: 47 },
+            { age: 7.1, distance: 451.2438, stores: 5, price: 57.1 }
+        ];
+
+        // Get max values
+        const maxAge = Math.max(...dataset.map(d => d.age));
+        const maxDistance = Math.max(...dataset.map(d => d.distance));
+        const maxStores = Math.max(...dataset.map(d => d.stores));
+
+        document.getElementById('maxAge').innerText = maxAge;
+        document.getElementById('maxDistance').innerText = maxDistance.toFixed(2);
+        document.getElementById('maxStores').innerText = maxStores;
+
+        function predictPrice() {
+            let age = parseFloat(document.getElementById('age').value);
+            let distance = parseFloat(document.getElementById('distance').value);
+            let stores = parseFloat(document.getElementById('stores').value);
+            let resultElement = document.getElementById('result');
+
+            // Clear previous classes
+            resultElement.classList.remove("error", "success");
+
+            if (isNaN(age) || isNaN(distance) || isNaN(stores)) {
+                resultElement.textContent = "Please enter valid numbers!";
+                resultElement.classList.add("error");
+                return;
+            }
+
+            if (age > maxAge || distance > maxDistance || stores > maxStores) {
+                resultElement.textContent = "No reasonable house found (input exceeds limits)";
+                resultElement.classList.add("error");
+                return;
+            }
+
+            let filteredByAge = dataset.filter(item => item.age >= (age - 0.5) && item.age <= (age + 0.5));
+
+            if (filteredByAge.length === 0) {
+                resultElement.textContent = "No reasonable house found (age mismatch)";
+                resultElement.classList.add("error");
+                return;
+            }
+
+            let bestMatch = filteredByAge.find(item => Math.abs(item.distance - distance) <= 10);
+
+            if (!bestMatch) {
+                resultElement.textContent = "No reasonable house found (distance mismatch)";
+                resultElement.classList.add("error");
+                return;
+            }
+
+            resultElement.textContent = `Predicted Price: $${bestMatch.price.toFixed(2)}`;
+            resultElement.classList.add("success");
+        }
+    </script>
+
+</body>
+</html>
